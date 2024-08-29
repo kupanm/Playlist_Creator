@@ -5,14 +5,13 @@
 4: Search for the song
 5: Add the song to the Spotify Playlist
 """
-
-from googleapiclient.discovery import build
+# from googleapiclient.discovery import build
 import os
 
-
-
 api_key = os.environ.get("YT_API_KEY")
-print(api_key)
+if not api_key:
+    raise ValueError("YT_API_KEY environment variable not set")
+# print(api_key)
 
 
 youtube = build('youtube',
@@ -21,7 +20,9 @@ youtube = build('youtube',
 
 request = youtube.channels().list(
     part='statistics',
-    forUsername='schafer5'
+    forUsername='******'
 )
 
 request = request.execute()
+
+print(request)
