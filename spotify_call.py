@@ -6,18 +6,17 @@
 import os
 
 
-client_id = os.environ.get("test")
+client_id = os.environ.get("SPOTIFY_CLIENT_ID")
 
 if not client_id:
     raise ValueError("No client ID found")
 
-print(client_id)
-# client_secret = os.environ.get("SPOTIFY_CLIENT_SECRET")
+client_secret = os.environ.get("SPOTIFY_CLIENT_SECRET")
 
-# if not client_secret:
-#     raise ValueError("No client secret found")
+if not client_secret:
+    raise ValueError("No client secret found")
 
 
-print(client_id)
+# print(client_id)
 
 # print(client_secret)

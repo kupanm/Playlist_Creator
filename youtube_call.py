@@ -5,24 +5,40 @@
 4: Search for the song
 5: Add the song to the Spotify Playlist
 """
-# from googleapiclient.discovery import build
+#project_env\Scripts\activate.bat
+
+
 import os
 
-api_key = os.environ.get("YT_API_KEY")
-if not api_key:
-    raise ValueError("YT_API_KEY environment variable not set")
-# print(api_key)
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+import googleapiclient.errors
 
+scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
 
-youtube = build('youtube',
-                'v3',
-                developerKey=api_key)
+def main():
+   # Disable OAuthlib's HTTPS verification when running locally.
+    # *DO NOT* leave this option enabled in production.
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-request = youtube.channels().list(
-    part='statistics',
-    forUsername='******'
-)
+    api_service_name = "youtube"
+    api_version = "v3"
+    client_secrets_file = "clients_secrets.json"
 
-request = request.execute()
+    # Get credentials and create an API client
+    flow = InstalledAppFlow.from_client_secrets_file(
+        client_secrets_file, scopes)
+    credentials = flow.run_local_server()
+    youtube = build(
+        api_service_name, api_version, credentials=credentials)
 
-print(request)
+    request = youtube.videos().list(
+        part="snippet,contentDetails",
+        myRating="like"
+    )
+    response = request.execute()
+
+    print(response)
+
+if __name__ == '__main__':
+    main()
