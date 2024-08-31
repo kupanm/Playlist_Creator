@@ -38,7 +38,16 @@ def main():
     )
     response = request.execute()
 
-    print(response)
+    # print(response)
+    
+    videos = response['items']
+    # print(videos)
+    
+    liked_music_videos = []
+    for video in videos:
+        if video['snippet']['categoryId'] == '10': # video is of category music
+            liked_music_videos.append((video['snippet']['title'], video['snippet']['channelTitle']))
 
+    print(liked_music_videos)
 if __name__ == '__main__':
     main()
