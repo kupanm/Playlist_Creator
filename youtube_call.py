@@ -14,40 +14,43 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import googleapiclient.errors
 
-scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
 
-def main():
-   # Disable OAuthlib's HTTPS verification when running locally.
-    # *DO NOT* leave this option enabled in production.
-    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+class YoutubeCall():
+    def __init__(self):
+        self.scopes = ["https://www.googleapis.com/auth/youtube.readonly"]
+        self.api_service_name = "youtube"
+        self.api_version = "v3"
+        self.client_secrets_file = "clients_secrets.json"
 
-    api_service_name = "youtube"
-    api_version = "v3"
-    client_secrets_file = "clients_secrets.json"
+    def api_call(self):
+        # Disable OAuthlib's HTTPS verification when running locally.
+        # *DO NOT* leave this option enabled in production.
+        os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
-    # Get credentials and create an API client
-    flow = InstalledAppFlow.from_client_secrets_file(
-        client_secrets_file, scopes)
-    credentials = flow.run_local_server()
-    youtube = build(
-        api_service_name, api_version, credentials=credentials)
+        flow = InstalledAppFlow.from_client_secrets_file(
+            self.client_secrets_file, self.scopes)
+        credentials = flow.run_local_server()
+        youtube = build(
+            self.api_service_name, self.api_version, credentials=credentials)
 
-    request = youtube.videos().list(
-        part="snippet,contentDetails",
-        myRating="like"
-    )
-    response = request.execute()
-
-    # print(response)
+        request = youtube.videos().list(
+            part="snippet,contentDetails",
+            myRating="like"
+        )
+        return request
     
-    videos = response['items']
-    # print(videos)
-    
-    liked_music_videos = []
-    for video in videos:
-        if video['snippet']['categoryId'] == '10': # video is of category music
-            liked_music_videos.append((video['snippet']['title'], video['snippet']['channelTitle']))
+    def filter_response(self, response):
+        liked_music_videos = []
+        videos = response['items']
+        for video in videos:
+            if video['snippet']['categoryId'] == '10': # video is of category music
+                liked_music_videos.append((video['snippet']['title'], video['snippet']['channelTitle']))
+        return liked_music_videos
 
-    print(liked_music_videos)
-if __name__ == '__main__':
-    main()
+
+youtube = YoutubeCall()
+response = youtube.api_call().execute()
+
+filtered = youtube.filter_response(response)
+
+print(filtered)
