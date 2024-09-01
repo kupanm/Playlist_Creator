@@ -11,6 +11,8 @@ from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, request, url_for, session, redirect
 import os
 from dotenv import load_dotenv
+import webbrowser
+
 
 load_dotenv()
 
@@ -32,6 +34,8 @@ app = Flask(__name__)
 app.config['SESSION_COOKIE_NAME'] = 'Spotify Cookie'
 app.secret_key = app_secret
 TOKEN_INFO = 'token_info'
+
+# webbrowser.open('http://127.0.0.1:5000', new=2)
 
 @app.route('/')
 def login():
@@ -55,7 +59,20 @@ def save_youtube_songs():
     except:
         print("USER NOT LOGGED IN")
         return redirect('/')
-    return("OAUTH SUCCESSFUL")
+    # return("OAUTH SUCCESSFUL")
+
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+    current_user = sp.current_user()
+    return current_user
+    # current_playlists = sp.current_user_playlists()['items']
+    # youtube_liked_music = ''
+    # for playlist in current_playlists:
+    #     if (playlist['name'] == "Youtube Liked Music"):
+    #         youtube_liked_music = playlist['id']
+    
+    # if not youtube_liked_music: # if playlist not in current playlists
+    #     return "Youtube Liked Music not found."
+
 
 def get_token():
     token_info = session.get(TOKEN_INFO, None)
@@ -74,7 +91,7 @@ def create_spotify_oauth():
     return SpotifyOAuth(client_id=client_id,
                         client_secret=client_secret,
                         redirect_uri=url_for('redirect_page', _external=True),
-                        scope='user-library-read playlist-modify-public playlist-modify-private')
+                        scope='user-read-email user-read-private user-library-read playlist-modify-public playlist-modify-private')
 
 
 app.run(debug=True)
