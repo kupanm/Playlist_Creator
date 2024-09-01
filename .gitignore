@@ -1,3 +1,4 @@
 playlist_venv/
 clients_secrets.json
 .env
+.cache
